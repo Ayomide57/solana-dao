@@ -15,7 +15,9 @@ pub struct FeatureList {
     pub authority: Pubkey,
     pub content: String,
     pub idx: u8,
+    pub company_idx: u8,
     pub vote_complete: bool,
+    pub vote_period: i64,
 }
 
 #[account]
@@ -26,4 +28,12 @@ pub struct VoteList {
     pub idx: u8,
     pub vote_check: bool,
     pub feature_idx: u8,
+}
+
+#[account]
+#[derive(Default)]
+pub struct CompanyList {
+    pub authority: Pubkey,
+    pub company_name: String,
+    pub company_image_url: String,
 }

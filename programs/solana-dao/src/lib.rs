@@ -20,13 +20,18 @@ pub mod solana_dao {
         Ok(())
     }
 
-    pub fn add_features(ctx: Context<AddFeatures>, _content) -> Result<()> {
+    pub fn add_features(ctx: Context<AddFeatures>, _content: String, _company_idx: u8, _vote_period: i64) -> Result<()> {
+        
+        let clock = Clock::get()?;
+        let current_timestamp = clock.unix_timestamp;
         let user_profile = &mut ctx.accounts.user_profile;
         let feature_list = &mut ctx.accounts.feature_list;
 
         feature_list.authority = ctx.accounts.authority.key();
         feature_list.content = _content;
         feature_list.idx = user_profile.last_feat;
+        feature_list.company_idx = _company_idx;
+        feature_list.vote_period = current_timestamp + _vote_period;
         feature_list.vote_complete = false;
 
         user_profile.last_feat = user_profile.last_feat.checked_add(1).unwrap();
@@ -44,6 +49,14 @@ pub mod solana_dao {
         voting_list.vote_check = true;
         voting_list.idx = voting_list.idx.checked_add(1).unwrap();
         voting_list.vote_count = voting_list.vote_count.checked_add(1).unwrap();
+
+        Ok(())
+    }
+
+    pub fn add_company(ctx: Context<AddCompany>, _company_name: String) -> Result<()> {
+        let company_list = &mut ctx.accounts.company_list;
+        company_list.authority = ctx.accounts.authority.key();
+        company_list.company_name = _company_name;
 
         Ok(())
     }
@@ -104,6 +117,24 @@ pub struct AddVoting<'info> {
     pub voting_list: Box<Account<'info, VoteList>>,
 
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction()]
+pub struct AddCompany<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    #[account(
+        init,
+        seeds = [COMPANY_TAG, authority.key().as_ref(), &[user_profile.user_type as u8].as_ref()],
+        payer = authority,
+        space = 8 + std::size_of::<CompanyList>()
+    )]
+    pub company_list: Box<Account<'info, CompanyList>>,
+
+    pub system_program: Program<'info, System>,
+
 }
 
 
