@@ -28,6 +28,8 @@ pub struct VoteList {
     pub idx: u8,
     pub vote_check: bool,
     pub feature_idx: u8,
+    pub company_idx: u8,
+    pub vote: VoteType,
 }
 
 #[account]
@@ -36,4 +38,25 @@ pub struct CompanyList {
     pub authority: Pubkey,
     pub company_name: String,
     pub company_image_url: String,
+    pub about: String,
 }
+
+#[account]
+#[derive(Default)]
+pub struct MemberList {
+    pub authority: Pubkey,
+    pub company_idx: u8,
+    pub member_count: u8,
+    pub idx: u8,
+    pub joined: bool,
+}
+
+#[derive(Debug, AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+pub enum VoteType {
+    For,
+    Against,
+    Abstain,
+}
+
+
+

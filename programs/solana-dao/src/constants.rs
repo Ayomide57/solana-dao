@@ -11,3 +11,6 @@ pub const FEATURE_TAG: &[u8] = b"FEATURE_STATE";
 
 #[constant]
 pub const COMPANY_TAG: &[u8] = b"COMPANY_STATE";
+
+#[constant]
+pub const MEMBER_TAG: &[u8] = b"MEMBER_STATE";
