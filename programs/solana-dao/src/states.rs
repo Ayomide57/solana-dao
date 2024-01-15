@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 #[derive(Default)]
 pub struct UserProfile {
     pub authority: Pubkey,
-    pub user_type: u8,
+    //pub user_type: u8,
     pub last_feat: u8,
     pub feat_count: u8,
 }

@@ -11,12 +11,12 @@ declare_id!("7AL1ZrQT9ehdtJFiEd3gnJgLJg9hki1C1nhujfncSPMV");
 pub mod solana_dao {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>, _user_type: u8) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         let user_profile = &mut ctx.accounts.user_profile;
         user_profile.authority = ctx.accounts.authority.key();
         user_profile.last_feat = 0;
         user_profile.feat_count = 0;
-        user_profile.user_type = _user_type;
+        //user_profile.user_type = _user_type;
         Ok(())
     }
 
@@ -57,7 +57,6 @@ pub mod solana_dao {
         let company_list = &mut ctx.accounts.company_list;
         company_list.authority = ctx.accounts.authority.key();
         company_list.company_name = _company_name;
-
         Ok(())
     }
 }
@@ -110,7 +109,7 @@ pub struct AddVoting<'info> {
 
     #[account(
         init,
-        seeds = [VOTE_TAG, authority.key().as_ref(), &[user_profile.user_type as u8].as_ref()],
+        seeds = [VOTE_TAG, authority.key().as_ref()],
         payer = authority,
         space = 8 + std::size_of::<VoteList>()
     )]
@@ -127,7 +126,7 @@ pub struct AddCompany<'info> {
 
     #[account(
         init,
-        seeds = [COMPANY_TAG, authority.key().as_ref(), &[user_profile.user_type as u8].as_ref()],
+        seeds = [COMPANY_TAG, authority.key().as_ref()],
         payer = authority,
         space = 8 + std::size_of::<CompanyList>()
     )]
