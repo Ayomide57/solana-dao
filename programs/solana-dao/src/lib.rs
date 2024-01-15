@@ -1,9 +1,10 @@
 use anchor_lang::prelude::*;
+use std::mem::size_of;
 
-pub mod errors;
+//pub mod errors;
 pub mod states;
 pub mod constants;
-use crate::{errors::*, states::*, constants::*};
+use crate::{states::*, constants::*};
 
 declare_id!("7AL1ZrQT9ehdtJFiEd3gnJgLJg9hki1C1nhujfncSPMV");
 
@@ -69,9 +70,9 @@ pub struct Initialize<'info> {
     #[account(
         init,
         seeds = [USER_TAG, authority.key().as_ref()],
-        //bump,
+        bump,
         payer = authority,
-        space = 8 + std::mem::size_of::<UserProfile>(),
+        space = 8 + size_of::<UserProfile>(),
     )]
     pub user_profile: Box<Account<'info, UserProfile>>,
     pub system_program: Program<'info, System>,
@@ -86,6 +87,7 @@ pub struct AddFeatures<'info> {
     #[account(
         mut,
         seeds = [USER_TAG, authority.key().as_ref()],
+        bump,
         has_one = authority
     )]
     pub user_profile: Box<Account<'info, UserProfile>>,
@@ -93,8 +95,9 @@ pub struct AddFeatures<'info> {
     #[account(
         init,
         seeds = [FEATURE_TAG, authority.key().as_ref(), &[user_profile.last_feat as u8].as_ref()],
+        bump,
         payer = authority,
-        space = 8 + std::size_of::<FeatureList>(),
+        space = 8 + size_of::<FeatureList>(),
     )]
     pub feature_list: Box<Account<'info, FeatureList>>,
 
@@ -110,8 +113,9 @@ pub struct AddVoting<'info> {
     #[account(
         init,
         seeds = [VOTE_TAG, authority.key().as_ref()],
+        bump,
         payer = authority,
-        space = 8 + std::size_of::<VoteList>()
+        space = 8 + size_of::<VoteList>()
     )]
     pub voting_list: Box<Account<'info, VoteList>>,
 
@@ -127,13 +131,19 @@ pub struct AddCompany<'info> {
     #[account(
         init,
         seeds = [COMPANY_TAG, authority.key().as_ref()],
+        bump,
         payer = authority,
-        space = 8 + std::size_of::<CompanyList>()
+        space = 8 + size_of::<CompanyList>()
     )]
     pub company_list: Box<Account<'info, CompanyList>>,
 
     pub system_program: Program<'info, System>,
 
+}
+
+pub fn bump(seeds: &[&[u8]], program_id: &Pubkey) -> u8 {
+    let (_found_key, bump) = Pubkey::find_program_address(seeds, program_id);
+    bump
 }
 
 
