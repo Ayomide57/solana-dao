@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider>
         <nav className="flex justify-end items-center px-16 py-4 bg-black">
-          <WalletMultiButton />
+          <WalletMultiButton />Armando was here
         </nav>
         <Component {...pageProps} />
       </WalletProvider>
