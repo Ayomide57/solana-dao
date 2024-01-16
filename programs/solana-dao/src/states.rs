@@ -5,8 +5,8 @@ use anchor_lang::prelude::*;
 pub struct UserProfile {
     pub authority: Pubkey,
     //pub user_type: u8,
-    pub last_feat: u8,
-    pub feat_count: u8,
+    //pub last_feat: u8,
+    //pub feat_count: u8,
 }
 
 #[account]
@@ -39,6 +39,8 @@ pub struct CompanyList {
     pub company_name: String,
     pub company_image_url: String,
     pub about: String,
+    pub last_feat: u8,
+    pub feat_count: u8,
 }
 
 #[account]
