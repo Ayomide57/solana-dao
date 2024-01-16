@@ -4,7 +4,6 @@ import { WalletProvider } from "@solana/wallet-adapter-react";
 import {
   getPhantomWallet,
   getSolflareWallet,
-  getSolletWallet,
 } from '@solana/wallet-adapter-wallets'
 import { useMemo } from "react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
@@ -18,7 +17,6 @@ export function ClientWalletProvider(
     () => [
       getPhantomWallet(),
       getSolflareWallet(),
-      getSolletWallet(),
     ],
     []
   );
