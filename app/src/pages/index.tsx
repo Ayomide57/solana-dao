@@ -1,10 +1,12 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import type { NextPage } from "next";
-import Head from "next/head";
 import { useProgram } from "../utils/useProgram";
-import { useRouter } from "next/router"
-
+import Layout, { LayoutContext } from "../components/Layout";
+import CompanyCard from "../components/CompanyCard";
+import SearchBar from "../components/SearchBar";
 import {
   initialize
 } from '../utils/callInstructions'
@@ -20,12 +22,13 @@ import {
 import {
   addMember
 } from '../utils/callInstructions'
+import HomeContainer from "../components/HomeContainer";
 
 
 const Home: NextPage = (props) => {
-  const wallet = useAnchorWallet();
-  const { connection } = useConnection();
-  const { program } = useProgram({ connection, wallet });
+  const { SystemProgram } = anchor.web3;
+
+
 
 // React UseStates hooks for managing args 
 //for initialize
@@ -82,16 +85,18 @@ const userProfile_for_addFeatures = ""
 const featureList_for_addFeatures = ""
 const votingList_for_addVoting = ""
 const companyList_for_addCompany = ""
-const memberList_for_addMember = ""
+  const memberList_for_addMember = ""
+  
+
 
 
   return (
-    <>
-      <Head>
-        <title>solana_dao</title>
-        <meta name="description" content="solana_dao" />
-      </Head>
-    </>
+    <Layout>
+          <div id="content" className="pb-6 pt-4">
+            <SearchBar />
+            <HomeContainer />
+          </div>
+    </Layout>
   );
 };
 

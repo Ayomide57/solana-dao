@@ -1,6 +1,6 @@
 import { web3 } from "@project-serum/anchor";
 
-export const initialize = (program, authority, userProfile, systemProgram,) => {
+export const initialize = (program, authority, userProfile, systemProgram) => {
   if (program) {
     (async () => {
       try {

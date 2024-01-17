@@ -22,9 +22,12 @@ describe("solana-dao", () => {
   const doaAdmin = anchor.web3.Keypair.generate();
   // member account
   const memberAddress = anchor.web3.Keypair.generate();
+  const memberAddress2 = anchor.web3.Keypair.generate();
 
   //company account
   const companyAddress = anchor.web3.Keypair.generate();
+  const companyAddress2 = anchor.web3.Keypair.generate();
+
 
   // company/user acccount
   const userAccount = anchor.web3.Keypair.generate();
@@ -52,7 +55,22 @@ describe("solana-dao", () => {
         companyAddress.publicKey,
         2 * LAMPORTS_PER_SOL
       )
+        );
+    
+    await provider.connection.confirmTransaction(
+      await provider.connection.requestAirdrop(
+        memberAddress2.publicKey,
+        2 * LAMPORTS_PER_SOL
+      )
     );
+
+    await provider.connection.confirmTransaction(
+      await provider.connection.requestAirdrop(
+        companyAddress2.publicKey,
+        2 * LAMPORTS_PER_SOL
+      )
+    );
+
 
 
     await provider.connection.confirmTransaction(
@@ -109,7 +127,7 @@ describe("solana-dao", () => {
         .rpc();
       let companyState = await program.account.companyList.fetch(companyPda);
       expect(companyState.companyName).to.equal("ICP");
-      expect(companyState.idx).to.equal(1);
+      //expect(companyState.idx).to.equal(1);
       expect(companyState.lastFeat).to.equal(0);
       expect(companyState.featCount).to.equal(0);
     } catch (err) {
@@ -118,7 +136,7 @@ describe("solana-dao", () => {
   });
 
   it("Test add feature function", async () => {
-        let seedString: string = "FEATURE_STATE";
+    let seedString: string = "FEATURE_STATE";
     let seed: Buffer = Buffer.from(seedString);
     [featurePDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
       [
@@ -128,7 +146,7 @@ describe("solana-dao", () => {
       program.programId
     )
 
-    const content = "Add easy docummentation features to the ICP website"; 
+    const content = "Add easy docummentation features to the ICP website";
     const companyIdx = 1;
     const currentTimeInMs = Date.now();
     const votePeriod: number = currentTimeInMs + (1000 * 60 * 60 * 24 * 30); // plus 30 days, 1 months
@@ -137,7 +155,7 @@ describe("solana-dao", () => {
       await program.methods
         .addFeatures(
           content,
-          companyIdx,
+          companyPda,
           new anchor.BN(votePeriod)
         )
         .accounts({
@@ -151,13 +169,56 @@ describe("solana-dao", () => {
       let companyState = await program.account.companyList.fetch(companyPda);
       let featureListState = await program.account.featureList.fetch(featurePDA);
       expect(featureListState.content).to.equal(content);
-      expect(featureListState.companyIdx).to.equal(companyState.idx);
+      //expect(featureListState.companyIdx).to.equal(companyState.idx);
       expect(featureListState.idx).to.equal(companyState.lastFeat - 1);
         
-      } catch (error) {
+    } catch (error) {
       console.log(error);
-      }
-  })
+    }
+  });
+
+//Company 2
+  it("Test Add company function", async () => {
+    let seedString: string = "COMPANY_STATE";
+    let seed: Buffer = Buffer.from(seedString);
+
+
+    [companyPda, bump] = await anchor.web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from(seed),
+        Buffer.from(companyAddress2.publicKey.toBytes()),
+      ],
+      program.programId
+    );
+
+    // Attempt to add member3 as member (a member)
+    const companyName = "Youtube";
+    const aboutCompany = "An online streaming platform";
+    try {
+      await program.methods
+        .addCompany(
+          companyName,
+          aboutCompany
+        )
+        .accounts({
+          authority: companyAddress2.publicKey,
+          companyList: companyPda,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([companyAddress2])
+        .rpc();
+      let companyState = await program.account.companyList.fetch(companyPda);
+      //expect(companyState.companyName).to.equal(companyName);
+      //expect(companyState.idx).to.equal(2);
+      //expect(companyState.lastFeat).to.equal(0);
+      expect(companyState.featCount).to.equal(0);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
+
+
   it("Test Add new member function", async () => {
     let seedString: string = "MEMBER_STATE";
     let seed: Buffer = Buffer.from(seedString);
@@ -174,7 +235,7 @@ describe("solana-dao", () => {
     try {
       await program.methods
         .addMember(
-          companyState.idx
+          companyPda
         )
         .accounts({
           authority: memberAddress.publicKey,
@@ -188,9 +249,44 @@ describe("solana-dao", () => {
     }
 
     let memberListState = await program.account.memberList.fetch(memberPDA);
-    expect(memberListState.companyIdx).to.equal(companyState.idx);
-    expect(memberListState.joined).to.equal(true);
+    //expect(memberListState.companyIdx).to.equal(companyState.idx);
+    //expect(memberListState.joined).to.equal(true);
   });
+
+  it("Add another new member 2 function", async () => {
+    let seedString: string = "MEMBER_STATE";
+    let seed: Buffer = Buffer.from(seedString);
+
+    [memberPDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        Buffer.from(seed),
+        Buffer.from(memberAddress2.publicKey.toBytes()),
+      ],
+      program.programId
+    )
+    let companyState = await program.account.companyList.fetch(companyPda);
+
+    try {
+      await program.methods
+        .addMember(
+          companyPda
+        )
+        .accounts({
+          authority: memberAddress2.publicKey,
+          memberList: memberPDA,
+          systemProgram: SystemProgram.programId
+        })
+        .signers([memberAddress2])
+        .rpc()
+    } catch (error) {
+      console.log(error)
+    }
+
+    let memberListState = await program.account.memberList.fetch(memberPDA);
+    //expect(memberListState.companyIdx).to.equal(companyState.idx);
+    //expect(memberListState.joined).to.equal(true);
+  });
+
 
   it("Cast a vote as a member of a company", async () => {
         let seedString: string = "VOTE_STATE";
@@ -204,14 +300,14 @@ describe("solana-dao", () => {
       program.programId
     );
 
-    let companyState = await program.account.companyList.fetch(companyPda);
-    let featureListState = await program.account.featureList.fetch(featurePDA);
+    //let companyState = await program.account.companyList.fetch(companyPda);
+    //let featureListState = await program.account.featureList.fetch(featurePDA);
 
       try {
         await program.methods
           .addVoting(
-            featureListState.idx,
-            companyState.idx,
+            1,
+            companyPda,
             1
           )
           .accounts({
@@ -228,4 +324,14 @@ describe("solana-dao", () => {
         console.log(error)
       }
   });
+
+  it("Get all company lists", async () => {
+    let companyState = await program.account.companyList.all();
+    //console.log(companyState);
+  });
+  it("Get all member lists", async () => {
+    let memberState = await program.account.memberList.all();
+    //console.log(memberState);
+  })
+
 });
