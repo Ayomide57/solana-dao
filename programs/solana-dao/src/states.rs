@@ -39,6 +39,7 @@ pub struct CompanyList {
     pub company_name: String,
     pub company_image_url: String,
     pub about: String,
+    pub idx: u8,
     pub last_feat: u8,
     pub feat_count: u8,
 }

@@ -6,7 +6,7 @@ pub mod states;
 pub mod constants;
 use crate::{states::*, constants::*, errors::*};
 
-declare_id!("7AL1ZrQT9ehdtJFiEd3gnJgLJg9hki1C1nhujfncSPMV");
+declare_id!("32rHXkV1bV2yqszKCtaGSGskBrqoyLsaPby96DxkVqjz");
 
 #[program]
 pub mod solana_dao {
@@ -23,8 +23,8 @@ pub mod solana_dao {
 
     pub fn add_features(ctx: Context<AddFeatures>, _content: String, _company_idx: u8, _vote_period: i64) -> Result<()> {
         // get the current date in solana
-        let clock = Clock::get()?;
-        let current_timestamp = clock.unix_timestamp;
+        //let clock = Clock::get()?;
+        //let current_timestamp = clock.unix_timestamp;
         let company_list = &mut ctx.accounts.company_list;
         let feature_list = &mut ctx.accounts.feature_list;
 
@@ -35,7 +35,7 @@ pub mod solana_dao {
         // add the current date to the duration selected by the company to vote for 
         //_vote period will be type Date::now in javascript and will be convert to seconds 
         //seconds can easily work with type i64 in rust
-        feature_list.vote_period = current_timestamp + _vote_period;
+        feature_list.vote_period = _vote_period;
         feature_list.vote_complete = false;
 
         company_list.last_feat = company_list.last_feat.checked_add(1).unwrap();
@@ -67,6 +67,9 @@ pub mod solana_dao {
         company_list.authority = ctx.accounts.authority.key();
         company_list.company_name = _company_name;
         company_list.about = _about;
+        company_list.idx = company_list.idx.checked_add(1).unwrap();
+        company_list.feat_count = 0;
+        company_list.last_feat = 0;
         Ok(())
     }
 
@@ -123,10 +126,11 @@ pub struct AddFeatures<'info> {
 
     #[account(
         init,
-        seeds = [FEATURE_TAG, authority.key().as_ref(), &[company_list.last_feat as u8].as_ref()],
+        //seeds = [FEATURE_TAG, authority.key().as_ref(), &company_list.last_feat.to_be_bytes()],
+        seeds = [FEATURE_TAG, authority.key().as_ref()],
         bump,
         payer = authority,
-        space = 8 + size_of::<FeatureList>(),
+        space = 8 + 100 + size_of::<FeatureList>(),
     )]
     pub feature_list: Box<Account<'info, FeatureList>>,
 
