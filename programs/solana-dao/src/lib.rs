@@ -6,7 +6,7 @@ pub mod states;
 pub mod constants;
 use crate::{states::*, constants::*, errors::*};
 
-declare_id!("32rHXkV1bV2yqszKCtaGSGskBrqoyLsaPby96DxkVqjz");
+declare_id!("6kcfzoGSjT4EqX9UHzwPw5UET9hVrYuA2LERx2Po33i");
 
 #[program]
 pub mod solana_dao {

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { LayoutContext } from "./Layout";
-import CompanyCard from "./CompanyCard";
+import { LayoutContext } from "../components/Layout";
+import CompanyCard from "../components/CompanyCard";
 
 const HomeContainer = () => {
     let { wallet, connection, program } = useContext(LayoutContext);
