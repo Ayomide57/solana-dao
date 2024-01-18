@@ -16,7 +16,7 @@ const Layout = ({ children }) => {
     return (
         <LayoutContext.Provider value={{ wallet, connection, program }}>
                 <Header />
-                <div>{ children }</div>
+                <div id="content" className="pb-6 pt-4">{ children }</div>
         </LayoutContext.Provider>
     );
 }

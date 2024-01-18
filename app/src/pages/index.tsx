@@ -22,7 +22,7 @@ import {
 import {
   addMember
 } from '../utils/callInstructions'
-import HomeContainer from "../components/HomeContainer";
+import HomeContainer from "../Container/HomeContainer";
 
 
 const Home: NextPage = (props) => {
