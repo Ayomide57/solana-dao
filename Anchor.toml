@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-solana_dao = "6kcfzoGSjT4EqX9UHzwPw5UET9hVrYuA2LERx2Po33i"
+solana_dao = "5L8Gqfw28KQUTTny47HitnDXf5QVnkEqQKFynWgJ9P9W"
 
 [registry]
 url = "https://api.apr.dev"
