@@ -4,4 +4,6 @@ use anchor_lang::prelude::*;
 pub enum AppError {
     #[msg("Not a voting option")]
     NotVotingOption,
+    #[msg("Not a company category")]
+    NotCompanyCategory
 }
