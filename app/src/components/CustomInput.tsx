@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from "react";
 
 interface ICustomInput {
-  onChange?: () => void;
+  onChange?: (event) => void;
   value?: string;
   style?: {};
   maxLength?: number;
@@ -43,6 +43,7 @@ const CustomInput = ({
               style={style}
               value={value}
               onChange={onChange}
+              required
             />
           </div>
         </div>

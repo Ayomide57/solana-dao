@@ -1,31 +1,44 @@
 import { web3 } from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
 
-export const initialize = (program, authority, userProfile, systemProgram) => {
+
+export const initialize = (program, authority, userProfile, systemProgram, connection) => {
   if (program) {
     (async () => {
       try {
+
         const tx = await program.methods
           .initialize()
           .accounts({
-            authority,
-            userProfile,
-            systemProgram,
+            authority: authority,
+            userProfile: userProfile,
+            systemProgram: systemProgram
           })
+          .signers([authority, userProfile])
           .rpc();
+        console.log(tx)
       } catch (error) { console.log(error) }
     })();
   }
 };
 
-export const addFeatures = (program, content, companyIdx, votePeriod, authority, userProfile, featureList, systemProgram,) => {
+//companyList == companyPDA
+//featureList == proposalPDA
+
+export const addFeatures = (program, authority, companyList, featureList, systemProgram, title, content, votePeriod ) => {
   if (program) {
     (async () => {
       try {
         const tx = await program.methods
-          .addFeatures( content, companyIdx, votePeriod,)
+          .addFeatures(
+            title,
+            companyList,
+            votePeriod,
+            content
+          )
           .accounts({
             authority,
-            userProfile,
+            companyList,
             featureList,
             systemProgram,
           })
@@ -35,48 +48,17 @@ export const addFeatures = (program, content, companyIdx, votePeriod, authority,
   }
 };
 
-export const addVoting = (program, featureIdx, companyIdx, vote, authority, votingList, systemProgram,) => {
+export const addVoting = (program, authority, votingList, companyList, featureList, systemProgram, memberList, featureIdx, vote) => {
   if (program) {
     (async () => {
       try {
         const tx = await program.methods
-          .addVoting( featureIdx, companyIdx, vote,)
+          .addVoting( featureIdx, companyList, featureList, vote)
           .accounts({
             authority,
             votingList,
-            systemProgram,
-          })
-          .rpc();
-      } catch (error) { console.log(error) }
-    })();
-  }
-};
-
-export const addCompany = (program, companyName, about, authority, companyList, systemProgram,) => {
-  if (program) {
-    (async () => {
-      try {
-        const tx = await program.methods
-          .addCompany( companyName, about,)
-          .accounts({
-            authority,
             companyList,
-            systemProgram,
-          })
-          .rpc();
-      } catch (error) { console.log(error) }
-    })();
-  }
-};
-
-export const addMember = (program, companyIdx, authority, memberList, systemProgram,) => {
-  if (program) {
-    (async () => {
-      try {
-        const tx = await program.methods
-          .addMember( companyIdx,)
-          .accounts({
-            authority,
+            featureList,
             memberList,
             systemProgram,
           })
@@ -85,4 +67,85 @@ export const addMember = (program, companyIdx, authority, memberList, systemProg
     })();
   }
 };
+
+export const addCompany = (program, authority, systemProgram, companyList, companyName, companyImageUrl, about, contractAddress, symbol, websites, terms, network, decimals, quorum, category
+) => {
+  if (program) {
+    (async () => {
+      try {
+        const tx = await program.methods
+          .addCompany(companyName, companyImageUrl, about, contractAddress, symbol, websites, terms, network, decimals, quorum, category)
+          .accounts({
+            authority,
+            companyList,
+            systemProgram,
+          })
+          .rpc();
+        return tx;
+      } catch (error) { console.log(error) }
+    })();
+  }
+};
+
+export const addMember = (program, companyList, authority, memberList, systemProgram,) => {
+  if (program) {
+    (async () => {
+      try {
+        const tx = await program.methods
+          .addMember( companyList)
+          .accounts({
+            authority,
+            memberList,
+            companyList,
+            systemProgram,
+          })
+          .rpc();
+        return tx;
+      } catch (error) { console.log(error) }
+    })();
+  }
+};
+
+export const getAllCompany = (program) => {
+  if (program) {
+    (async () => {
+      try {
+        const tx = await program.account.companyList.all();
+        return tx;
+      } catch (error) {
+        
+      }
+    })
+  }
+}
+
+export const getAllProposal = (program) => {
+  if (program) {
+    (async () => {
+      try {
+        const tx = await program.account.featureList.all();
+        return tx;
+      } catch (error) {
+        
+      }
+    })
+  }
+}
+
+export const createPDA = (program, seed, wallet) => {
+  if (program) {
+    (async () => {
+      try {
+        const [dataPda, bump] = await anchor.web3.PublicKey.findProgramAddress(
+              [Buffer.from(seed), Buffer.from(wallet.publicKey.toBytes())],
+              program.programId
+          );
+          return dataPda
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  }
+}
+
 

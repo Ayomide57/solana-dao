@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { LayoutContext } from "../components/Layout";
 import CustomButton from "../components/Button";
 import CustomInput from "../components/CustomInput";
@@ -6,18 +6,84 @@ import CustomTextarea from "../components/CustomTextarea";
 import CustomSelect from "../components/CustomSelect";
 import CustomLabel from "../components/CustomLabel";
 import Sidebar from "../components/Sidebar";
+import { useStorageUpload } from "@thirdweb-dev/react";
+import * as anchor from "@coral-xyz/anchor";
+import { addCompany, createPDA } from "../utils/callInstructions";
+
+
 
 const AddCompanyContainer = () => {
   let { wallet, connection, program } = useContext(LayoutContext);
   
-  const [companyname, updateCompanyName] = useState(null);
-    const [about, updateAbout] = useState(null);
-  const [category, updateCategory] = useState(null);
-  const [website, updateWebsite] = useState(null);
-    const [terms, updateTerms] = useState(null);
-    const [twitter, updateTwitter] = useState(null);
-    const [github, updateGithub] = useState(null);
-    const [coingecko, updateCoingecko] = useState(null);
+  const [companyname, updateCompanyName] = useState<string>("");
+  const [about, updateAbout] = useState<string>("");
+  const [category, updateCategory] = useState<string>("");
+  const [website, updateWebsite] = useState<string>("");
+  const [terms, updateTerms] = useState<string>("");
+  const [twitter, updateTwitter] = useState<string>("");
+  const [github, updateGithub] = useState<string>("");
+  const [coingecko, updateCoingecko] = useState<string>("");
+  const [contractAddress, updateContractAddress] = useState<string>("");
+  const [symbol, updateSymbols] = useState<string>("");
+  const [network, updateNetwork] = useState<string>("");
+  const [quorum, updateQuorum] = useState<string>("");
+  const [decimals, updateDecimals] = useState<string>("");
+
+  const [ipfsLink, updateLink] = useState<any>();
+  const { mutateAsync: upload } = useStorageUpload();
+  const { SystemProgram } = anchor.web3;
+
+
+  const uploadFile = async(event) => {
+    let file = event.target.files[0];
+    const uris = await upload({ data: [file] });
+    updateLink(uris);
+        //const uris = await upload({ data: dataToUpload });
+  }
+
+    const seedString: string = "COMPANY_STATE";
+    const seed: Buffer = Buffer.from(seedString);
+
+  const companyPda = createPDA(program, seed, wallet);
+  
+  const submitCompany = async () => {
+    const result = addCompany(
+      program,
+      wallet,
+      SystemProgram.programId,
+      companyPda,
+      companyname,
+      ipfsLink,
+      about,
+      contractAddress,
+      symbol,
+      website,
+      terms,
+      network,
+      decimals,
+      quorum,
+      category
+    );
+  }
+  
+  
+
+  const options = [
+    { id: 0, name: "Protocol" },
+    { id: 1, name: "Social" },
+    { id: 2, name: "Investment" },
+    { id: 3, name: "Grant" },
+    { id: 4, name: "Service" },
+    { id: 5, name: "Media" },
+    { id: 6, name: "Creator" },
+    { id: 7, name: "Collector" },
+  ];
+
+  useEffect(() => {
+    //uploadFile();
+    console.log(ipfsLink);
+  }, [ipfsLink]);
+
 
     return (
       <div
@@ -62,23 +128,13 @@ const AddCompanyContainer = () => {
                   <div className="flex flex-col-reverse sm:flex-row">
                     <div className="mt-3 w-full space-y-2 sm:mt-0">
                       <div className="flex w-full">
-                        <div>
+                        <label htmlFor="myfile">
                           <span className="mb-[2px] flex items-center gap-1 text-skin-text"></span>
                           <div>
                             <div className="relative">
                               <div>
                                 <img
-                                  className="rounded-full bg-skin-border object-cover"
-                                  alt="avatar"
-                                  style={{
-                                    width: "80px",
-                                    height: "80px",
-                                    minWidth: "80px",
-                                    display: "none",
-                                  }}
-                                />
-                                <img
-                                  src="https://cdn.stamp.fyi/space/uniswapgovernance.eth?s=160&amp;cb=7b5f087c16a60022"
+                                  src="/avatarImage.jpg"
                                   className="rounded-full bg-skin-border object-cover"
                                   alt="avatar"
                                   style={{
@@ -88,8 +144,8 @@ const AddCompanyContainer = () => {
                                   }}
                                 />
                               </div>
-                              <div className="absolute bottom-0 left-0 right-0 top-0 cursor-not-allowed"></div>
-                              <div className="cursor-not-allowed absolute bottom-[2px] right-0 rounded-full bg-skin-heading p-1">
+                              <div className="absolute bottom-0 left-0 right-0 top-0"></div>
+                              <div className="absolute bottom-[2px] right-0 rounded-full bg-skin-heading p-1">
                                 <svg
                                   viewBox="0 0 24 24"
                                   width="1.2em"
@@ -110,17 +166,22 @@ const AddCompanyContainer = () => {
                           </div>
                           <input
                             className="h-[80px]"
+                            id="myfile"
                             type="file"
                             accept="image/jpg, image/jpeg, image/png"
                             style={{ display: "none" }}
+                            onChange={(event) => uploadFile(event)}
                           />
-                        </div>
+                        </label>
                       </div>
                       <CustomInput
                         placeholder="e.g. Yam Network"
                         maxLength={32}
                         name="companyname"
                         label="Name"
+                        onChange={(event) =>
+                          updateCompanyName(event.target.value)
+                        }
                         value={companyname}
                       />
                       <CustomTextarea
@@ -129,6 +190,7 @@ const AddCompanyContainer = () => {
                         placeholder="What is your organisation about?"
                         maxLength={160}
                         style={{ resize: "none", height: "65px" }}
+                        onChange={(event) => updateAbout(event.target.value)}
                         value={about}
                       />
                       <CustomSelect
@@ -136,6 +198,7 @@ const AddCompanyContainer = () => {
                         label="Categorie(s)"
                         placeholder="Select Categorie(s)"
                         style={{ maxWidth: "100%" }}
+                        options={options}
                         icon={
                           <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                             <svg
@@ -161,6 +224,7 @@ const AddCompanyContainer = () => {
                         maxLength={256}
                         name="website"
                         label="Website"
+                        onChange={(event) => updateWebsite(event.target.value)}
                         value={website}
                         icon={
                           <div className="  absolute inset-y-0 left-0 flex items-center pl-3">
@@ -187,6 +251,7 @@ const AddCompanyContainer = () => {
                         maxLength={256}
                         name="terms"
                         label="Terms of service"
+                        onChange={(event) => updateTerms(event.target.value)}
                         value={terms}
                         icon={
                           <div className="  absolute inset-y-0 left-0 flex items-center pl-3">
@@ -208,6 +273,61 @@ const AddCompanyContainer = () => {
                           </div>
                         }
                       />
+                      <CustomInput
+                        placeholder="e.g. Yam Network"
+                        maxLength={32}
+                        name="companyname"
+                        label="Name"
+                        onChange={(event) =>
+                          updateCompanyName(event.target.value)
+                        }
+                        value={companyname}
+                      />
+                      <CustomInput
+                        placeholder="e.g 71fjkdjfdnbj59nfcnmd58cnnfj9b0"
+                        maxLength={32}
+                        name="contractAddress"
+                        label="Contract Address"
+                        onChange={(event) =>
+                          updateContractAddress(event.target.value)
+                        }
+                        value={contractAddress}
+                      />
+                      <CustomInput
+                        placeholder="e.g. Yam"
+                        maxLength={32}
+                        name="symbol"
+                        label="Symbol"
+                        onChange={(event) => updateSymbols(event.target.value)}
+                        value={symbol}
+                      />
+                      <CustomInput
+                        placeholder="e.g. EVM"
+                        maxLength={32}
+                        name="network"
+                        label="Network"
+                        onChange={(event) => updateNetwork(event.target.value)}
+                        value={network}
+                      />
+                      <CustomInput
+                        placeholder="e.g. 1000"
+                        maxLength={32}
+                        name="quorum"
+                        label="Quorum"
+                        onChange={(event) => updateQuorum(event.target.value)}
+                        value={quorum}
+                      />
+                      <CustomInput
+                        placeholder="e.g. 18"
+                        maxLength={32}
+                        name="decimals"
+                        label="Decimals"
+                        onChange={(event) =>
+                          updateDecimals(event.target.value)
+                        }
+                        value={decimals}
+                      />
+
                       <div className="flex space-x-2 pr-2 pt-1 items-center">
                         <button
                           className="tune-switch relative inline-flex h-[22px] w-[38px] flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out switched-off-bg !cursor-not-allowed"
@@ -281,6 +401,7 @@ const AddCompanyContainer = () => {
                       label="Twitter"
                       placeholder="e.g. elonmusk"
                       maxLength={15}
+                      onChange={(event) => updateTwitter(event.target.value)}
                       value={twitter}
                       icon={
                         <div className="  absolute inset-y-0 left-0 flex items-center pl-3">
@@ -303,6 +424,7 @@ const AddCompanyContainer = () => {
                       placeholder="e.g. vbuterin"
                       maxLength={39}
                       value={github}
+                      onChange={(event) => updateGithub(event.target.value)}
                       icon={
                         <div className="  absolute inset-y-0 left-0 flex items-center pl-3">
                           <svg
@@ -331,6 +453,7 @@ const AddCompanyContainer = () => {
                       placeholder="e.g. uniswap"
                       maxLength={32}
                       value={coingecko}
+                      onChange={(event) => updateCoingecko(event.target.value)}
                     />
                   </div>
                 </div>

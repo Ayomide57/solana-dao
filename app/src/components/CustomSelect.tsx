@@ -9,6 +9,7 @@ interface ICustomSelect {
   placeholder?: string;
   label: string;
   icon?: ReactNode;
+  options: any;
 }
 
 const CustomSelect = ({
@@ -20,7 +21,9 @@ const CustomSelect = ({
   placeholder,
   label,
   icon,
+  options
 }: ICustomSelect) => {
+
   return (
     //cursor-not-allowed
     <div>
@@ -40,7 +43,12 @@ const CustomSelect = ({
                           name={name}
               style={style}
             >
-                <option>{ placeholder }</option>
+              <option>{placeholder}</option>
+              {options.map((list) => (
+                <option key={list.id} value={list.id}>
+                  {list.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>

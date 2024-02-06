@@ -18,7 +18,7 @@ const CustomButton = ({ onClick, value, btntype, style }: ICustomButton) => {
           : "text-white p-3 pl-20 pr-20 bg-gray-800 border-y border-skin-border bg-skin-block-bg text-base md:border border rounded-full"
       }
       style={style}
-      onClick={() => onClick}
+      onClick={onClick}
     >
       {value}
     </button>

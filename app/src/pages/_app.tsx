@@ -2,6 +2,7 @@ import React from "react";
 import type { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
 
 import "../styles/globals.css";
 import "../styles/daolist.css";
@@ -22,7 +23,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider>
-        <Component {...pageProps} />
+        <ThirdwebProvider
+          clientId={process.env.ClIENT_ID} // You can get a client id from dashboard settings
+          activeChain="goerli"
+        >
+          <Component {...pageProps} />
+        </ThirdwebProvider>
       </WalletProvider>
     </ConnectionProvider>
   );

@@ -19,7 +19,7 @@ const Header = () => {
       <nav className="flex justify-end items-center px-16 py-4 bg-black">
         <Link href={""}>
           <a href="" style={{ color: "white", padding: "10px" }}>
-            DAO
+            VirtualShot
           </a>
         </Link>
 
@@ -44,14 +44,15 @@ const Header = () => {
             backgroundColor: "#4e44ce",
             marginLeft: "10px",
             marginRight: "10px",
-            borderRadius: "10px"
+            borderRadius: "10px",
           }}
           onClick={() =>
             initialize(
               program,
               wallet.publicKey,
               userAccount.publicKey,
-              SystemProgram.programId
+              SystemProgram.programId,
+              connection
             )
           }
           value="Initiatlize"

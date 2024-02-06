@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from "react";
 
 interface ICustomTextarea {
-  onChange?: () => void;
+  onChange?: (event: any) => void;
   value?: string;
   style?: {};
   maxLength?: number;
@@ -33,6 +33,8 @@ const CustomTextarea = ({
         maxLength={maxLength}
         style={style}
         value={value}
+        onChange={onChange}
+        required
       ></textarea>
     </div>
   );

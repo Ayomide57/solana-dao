@@ -76,7 +76,7 @@
       ],
       "args": [
         {
-          "name": "content",
+          "name": "title",
           "type": "string"
         },
         {
@@ -86,6 +86,10 @@
         {
           "name": "votePeriod",
           "type": "i64"
+        },
+        {
+          "name": "content",
+          "type": "string"
         }
       ]
     },
@@ -103,6 +107,21 @@
           "isSigner": false
         },
         {
+          "name": "featureList",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "memberList",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "companyList",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -111,10 +130,14 @@
       "args": [
         {
           "name": "featureIdx",
-          "type": "u8"
+          "type": "u32"
         },
         {
           "name": "companyPubkey",
+          "type": "publicKey"
+        },
+        {
+          "name": "featurePubkey",
           "type": "publicKey"
         },
         {
@@ -148,8 +171,44 @@
           "type": "string"
         },
         {
+          "name": "companyImageUrl",
+          "type": "string"
+        },
+        {
           "name": "about",
           "type": "string"
+        },
+        {
+          "name": "contractAddress",
+          "type": "string"
+        },
+        {
+          "name": "websites",
+          "type": "string"
+        },
+        {
+          "name": "terms",
+          "type": "string"
+        },
+        {
+          "name": "network",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "decimal",
+          "type": "u8"
+        },
+        {
+          "name": "quorum",
+          "type": "u32"
+        },
+        {
+          "name": "category",
+          "type": "u8"
         }
       ]
     },
@@ -167,6 +226,11 @@
           "isSigner": false
         },
         {
+          "name": "companyList",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -178,6 +242,32 @@
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "makeMemberAdmin",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "memberList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "companyList",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -189,80 +279,6 @@
           {
             "name": "authority",
             "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "FeatureList",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "publicKey"
-          },
-          {
-            "name": "companyPubkey",
-            "type": "publicKey"
-          },
-          {
-            "name": "content",
-            "type": "string"
-          },
-          {
-            "name": "idx",
-            "type": "u8"
-          },
-          {
-            "name": "companyIdx",
-            "type": "u8"
-          },
-          {
-            "name": "voteComplete",
-            "type": "bool"
-          },
-          {
-            "name": "votePeriod",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "VoteList",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "publicKey"
-          },
-          {
-            "name": "companyPubkey",
-            "type": "publicKey"
-          },
-          {
-            "name": "voteCount",
-            "type": "u8"
-          },
-          {
-            "name": "idx",
-            "type": "u8"
-          },
-          {
-            "name": "voteCheck",
-            "type": "bool"
-          },
-          {
-            "name": "featureIdx",
-            "type": "u8"
-          },
-          {
-            "name": "vote",
-            "type": {
-              "defined": "VoteType"
-            }
           }
         ]
       }
@@ -289,12 +305,210 @@
             "type": "string"
           },
           {
-            "name": "lastFeat",
+            "name": "contractAddress",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": {
+              "defined": "CompanyCategory"
+            }
+          },
+          {
+            "name": "websites",
+            "type": "string"
+          },
+          {
+            "name": "terms",
+            "type": "string"
+          },
+          {
+            "name": "network",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "decimal",
             "type": "u8"
           },
           {
+            "name": "quorum",
+            "type": "u32"
+          },
+          {
+            "name": "lastFeat",
+            "type": "u32"
+          },
+          {
             "name": "featCount",
+            "type": "u32"
+          },
+          {
+            "name": "memberCount",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CompanyInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "companyName",
+            "type": "string"
+          },
+          {
+            "name": "companyImageUrl",
+            "type": "string"
+          },
+          {
+            "name": "about",
+            "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": {
+              "defined": "CompanyCategory"
+            }
+          },
+          {
+            "name": "websites",
+            "type": "string"
+          },
+          {
+            "name": "terms",
+            "type": "string"
+          },
+          {
+            "name": "network",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "decimal",
             "type": "u8"
+          },
+          {
+            "name": "quorum",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SocialType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "github",
+            "type": "string"
+          },
+          {
+            "name": "twitter",
+            "type": "string"
+          },
+          {
+            "name": "coinGecko",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeatureList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "companyPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "content",
+            "type": "string"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
+          },
+          {
+            "name": "companyIdx",
+            "type": "u32"
+          },
+          {
+            "name": "voteComplete",
+            "type": "bool"
+          },
+          {
+            "name": "votePeriod",
+            "type": "i64"
+          },
+          {
+            "name": "voteCount",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "companyPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "featurePubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "voteCount",
+            "type": "u32"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
+          },
+          {
+            "name": "voteCheck",
+            "type": "bool"
+          },
+          {
+            "name": "featureIdx",
+            "type": "u32"
+          },
+          {
+            "name": "vote",
+            "type": {
+              "defined": "VoteType"
+            }
           }
         ]
       }
@@ -314,14 +528,22 @@
           },
           {
             "name": "memberCount",
-            "type": "u8"
+            "type": "u32"
+          },
+          {
+            "name": "bio",
+            "type": "string"
           },
           {
             "name": "idx",
-            "type": "u8"
+            "type": "u32"
           },
           {
             "name": "joined",
+            "type": "bool"
+          },
+          {
+            "name": "admin",
             "type": "bool"
           }
         ]
@@ -345,6 +567,38 @@
           }
         ]
       }
+    },
+    {
+      "name": "CompanyCategory",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Protocol"
+          },
+          {
+            "name": "Social"
+          },
+          {
+            "name": "Investment"
+          },
+          {
+            "name": "Grant"
+          },
+          {
+            "name": "Service"
+          },
+          {
+            "name": "Media"
+          },
+          {
+            "name": "Creator"
+          },
+          {
+            "name": "Collector"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -352,9 +606,14 @@
       "code": 6000,
       "name": "NotVotingOption",
       "msg": "Not a voting option"
+    },
+    {
+      "code": 6001,
+      "name": "NotCompanyCategory",
+      "msg": "Not a company category"
     }
   ],
   "metadata": {
-    "address": "32rHXkV1bV2yqszKCtaGSGskBrqoyLsaPby96DxkVqjz"
+    "address": "DgBc1H8dVM2rd9444ioY5QLy34Nh2bTX7auq8VMjv5t6"
   }
 }
